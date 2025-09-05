@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useContext, createContext, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useSearchParams } from "react-router-dom";
 
 
 /**
@@ -161,6 +160,13 @@ function Shell({ children, hero }) {
 // -----------------------------
 function HomePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const handleRedirect = () => {
+    const qqxx1 = searchParams.get("qqxx1");
+    navigate(`/rsvp?qqxx1=${qqxx1}`);
+  };
+
+
   return (
     <Shell
       hero={
@@ -195,7 +201,7 @@ function HomePage() {
                 Saturday • November 22, 2025
               </p> <br/>
               <button
-                onClick={() => navigate("/rsvp")}
+                onClick={handleRedirect}
                 className="mt-8 w-full sm:w-auto inline-flex items-center justify-center rounded-2xl border-2 border-white text-white px-6 py-3 font-medium shadow hover:bg-white hover:text-gray-900 transition"
               >
                 Confirm RSVP
