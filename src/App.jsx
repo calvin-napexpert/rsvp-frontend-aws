@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useContext, createContext, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate, useSearchParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useSearchParams, useLocation  } from "react-router-dom";
 
 
 /**
@@ -91,20 +91,23 @@ function RadioGroup({ name, options, value, onChange }) {
 // -----------------------------
 function Nav() {
   const [open, setOpen] = React.useState(false);
+  const location = useLocation();
+  const query = location.search; // e.g. "?qqxx=abc123" 
 
+  
   return (
     <nav className="border-b bg-white/80 backdrop-blur sticky top-0 z-10">
       <Container className="py-3 flex items-center justify-between">
-        <Link to="/" className="font-semibold text-base md:text-lg">Diane & Calvin</Link>
+        <Link to={`/${query}`} className="font-semibold text-base md:text-lg">Diane & Calvin</Link>
 
         {/* Desktop links */}
         <div className="hidden md:flex gap-4 text-sm">
-          <Link className="hover:underline" to="/">Home</Link>
-          <Link className="hover:underline" to="/details">Wedding Details</Link>
-          <Link className="hover:underline" to="/venue">Venue</Link>
-          <Link className="hover:underline" to="/attire">Attire</Link>
-          <Link className="hover:underline" to="/faqs">FAQs</Link>
-          <Link className="hover:underline" to="/your-rsvp">Your RSVP</Link>
+          <Link className="hover:underline" to={`/${query}`}>Home</Link>
+          <Link className="hover:underline" to={`/details${query}`}>Wedding Details</Link>
+          <Link className="hover:underline" to={`/venue${query}`}>Venue</Link>
+          <Link className="hover:underline" to={`/attire${query}`}>Attire</Link>
+          <Link className="hover:underline" to={`/faqs${query}`}>FAQs</Link>
+          <Link className="hover:underline" to={`/your-rsvp${query}`}>Your RSVP</Link>
         </div>
 
         {/* Mobile button */}
@@ -173,14 +176,14 @@ function HomePage() {
         <div className="relative min-h-screen">
           {/* Desktop image */}
           <img
-            src="/IMG_wedding_banner2.jpg"
+            src="IMG_wedding_banner2.jpg"
             alt="Diane & Calvin Wedding Banner"
             className="hidden sm:block absolute inset-0 w-full h-full object-cover object-center"
           />
 
           {/* Mobile image */}
           <img
-            src="/IMG_wedding_banner_mobile.jpg"
+            src="IMG_wedding_banner_mobile.jpg"
             alt="Diane & Calvin Wedding Banner Mobile"
             className="block sm:hidden absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -252,7 +255,7 @@ function DetailsPage() {
           {/* Image */}
           <div className="relative h-48 rounded-xl overflow-hidden mb-4">
             <img
-              src="/IMG_church.jpg"
+              src="IMG_church.jpg"
               alt="Barasoain Church"
               className="w-full h-full object-cover"
             />
@@ -291,7 +294,7 @@ function DetailsPage() {
           {/* Image */}
           <div className="relative h-48 rounded-xl overflow-hidden mb-4">
             <img
-              src="/IMG_reception.jpg"
+              src="IMG_reception.jpg"
               alt="Felicisima Paz Grand Pavilion & Private Resort"
               className="w-full h-full object-cover"
             />
@@ -374,9 +377,9 @@ function AttirePage() {
             Modern Filipiniana inspiration — panuelo, butterfly sleeves, soft silhouettes. Replace these images with your selections.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <img src="/sample_ninang_1.png" alt="Ninang Look 1" className="w-full h-40 object-cover rounded-lg border" />
-            <img src="/sample_ninang_2.jpg" alt="Ninang Look 2" className="w-full h-40 object-cover rounded-lg border" />
-            <img src="/sample_ninang_3.png" alt="Ninang Look 3" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninang_1.png" alt="Ninang Look 1" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninang_2.jpg" alt="Ninang Look 2" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninang_3.png" alt="Ninang Look 3" className="w-full h-40 object-cover rounded-lg border" />
           </div>
         </div>
       );
@@ -388,9 +391,9 @@ function AttirePage() {
             Beige/cream barong, classic black trousers, dress shoes (no sneakers). Replace images with your preferred looks.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <img src="/sample_ninong_1.jpeg" alt="Ninong Look 1" className="w-full h-40 object-cover rounded-lg border" />
-            <img src="/sample_ninong_1.webp" alt="Ninong Look 2" className="w-full h-40 object-cover rounded-lg border" />
-            <img src="/sample_ninong_3.jpg" alt="Ninong Look 3" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninong_1.jpeg" alt="Ninong Look 1" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninong_1.webp" alt="Ninong Look 2" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninong_3.jpg" alt="Ninong Look 3" className="w-full h-40 object-cover rounded-lg border" />
           </div>
         </div>
       );
