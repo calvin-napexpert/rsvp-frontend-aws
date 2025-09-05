@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useContext, createContext, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 
 /**
@@ -567,15 +568,21 @@ function RsvpPage() {
   const navigate = useNavigate();
   const { setRsvp } = useRSVP();
 
+  const [searchParams] = useSearchParams();
+  const plusOneParam = searchParams.get("qqxx1");
+
   const [submitted, setSubmitted] = useState(false);
   const [attendance, setAttendance] = useState(""); // Yes | No | Maybe
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [side, setSide] = useState("Bride");
-  const [plusAllowance, setPlusAllowance] = useState("Not Allowed"); // Allowed | Not Allowed
+  // const [plusAllowance, setPlusAllowance] = useState("Not Allowed"); // Allowed | Not Allowed
+  const [plusAllowance, setPlusAllowance] = useState(plusOneParam === "qqwwwq23221124asdfaeflkj1ohui12uih3hui12huiadjknadnjkcqnjkciough12uihg3123f2qq" ? "Allowed" : "Not Allowed");
   const [plusName, setPlusName] = useState("");
   const [bringingCar, setBringingCar] = useState("No");
   const [errors, setErrors] = useState([]);
+
+
 
   const validate = () => {
     const errs = [];
@@ -727,13 +734,29 @@ function RsvpPage() {
               </Select>
             </div>
 
-            <div>
+            {/* <div>
               <FieldLabel required>Plus-one allowance</FieldLabel>
               <Select value={plusAllowance} onChange={setPlusAllowance} required>
                 <option value="Allowed">Allowed</option>
                 <option value="Not Allowed">Not Allowed</option>
               </Select>
-            </div>
+            </div> */}
+
+              {false && (
+                <div>
+                  <FieldLabel required>Plus-one allowance</FieldLabel>
+                  <Select
+                    value={plusAllowance}
+                    onChange={() => {}}
+                    required
+                    disabled
+                  >
+                    <option value="Allowed">Allowed</option>
+                    <option value="Not Allowed">Not Allowed</option>
+                  </Select>
+                </div>
+              )}
+
 
             {plusAllowance === "Allowed" && attendance !== "No" && (
               <div>
