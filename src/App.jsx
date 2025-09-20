@@ -96,45 +96,70 @@ function Nav() {
 
   
   return (
-    <nav className="border-b bg-white/80 backdrop-blur sticky top-0 z-10">
-      <Container className="py-3 flex items-center justify-between">
-        <Link to={`/${query}`} className="font-semibold text-base md:text-lg">Diane & Calvin</Link>
+
+    <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur">
+      {/* Header bar */}
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+        <Link to={`/${query}`} className="font-greatvibes text-4xl sm:text-5xl md:text-6xl mt-1 text-base md:text-lg">
+          Diane &amp; Calvin
+        </Link>
 
         {/* Desktop links */}
-        <div className="hidden md:flex gap-4 text-sm">
+        <div className="hidden items-center gap-4 text-sm md:flex">
           <Link className="hover:underline" to={`/${query}`}>Home</Link>
           <Link className="hover:underline" to={`/details${query}`}>Wedding Details</Link>
-          <Link className="hover:underline" to={`/venue${query}`}>Venue</Link>
           <Link className="hover:underline" to={`/attire${query}`}>Attire</Link>
+          <Link className="hover:underline" to={`/entourage${query}`}>Entourage</Link>
           <Link className="hover:underline" to={`/faqs${query}`}>FAQs</Link>
           <Link className="hover:underline" to={`/your-rsvp${query}`}>Your RSVP</Link>
         </div>
 
-        {/* Mobile button */}
+        {/* Mobile hamburger */}
         <button
-          className="md:hidden inline-flex items-center justify-center rounded-xl border border-gray-300 px-3 py-2"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
+          type="button"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 md:hidden"
+          onClick={() => setOpen((s) => !s)}
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
         >
-          <span className="block w-5 h-0.5 bg-gray-800 mb-1"></span>
-          <span className="block w-5 h-0.5 bg-gray-800 mb-1"></span>
-          <span className="block w-5 h-0.5 bg-gray-800"></span>
+          {open ? (
+            // X icon
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M6 6L18 18" />
+              <path d="M18 6L6 18" />
+            </svg>
+          ) : (
+            // Hamburger icon (perfectly centered, rounded ends)
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M4 7h16" />
+              <path d="M4 12h16" />
+              <path d="M4 17h16" />
+            </svg>
+          )}
         </button>
-      </Container>
+      </div>
+
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        onClick={() => setOpen(false)}
+      />
 
       {/* Mobile drawer */}
-      {open && (
-        <div className="md:hidden border-t bg-white">
-          <Container className="py-3 grid gap-2 text-sm">
-            <Link className="py-2" to="/" onClick={() => setOpen(false)}>Home</Link>
-            <Link className="py-2" to="/details" onClick={() => setOpen(false)}>Wedding Details</Link>
-            <Link className="py-2" to="/venue" onClick={() => setOpen(false)}>Venue</Link>
-            <Link className="py-2" to="/attire" onClick={() => setOpen(false)}>Attire</Link>
-            <Link className="py-2" to="/faqs" onClick={() => setOpen(false)}>FAQs</Link>
-            <Link className="py-2" to="/your-rsvp" onClick={() => setOpen(false)}>Your RSVP</Link>
-          </Container>
+      <div
+        className={`fixed left-0 right-0 top-14 z-50 border-t bg-white transition-[opacity,transform] duration-200 md:hidden ${
+          open ? "translate-y-0 opacity-100" : "-translate-y-2 pointer-events-none opacity-0"
+        }`}
+      >
+        <div className="mx-auto grid max-w-7xl gap-1.5 px-4 py-3 text-sm">
+          <Link className="py-2" to={`/${query}`} onClick={() => setOpen(false)}>Home</Link>
+          <Link className="py-2" to={`/details${query}`} onClick={() => setOpen(false)}>Wedding Details</Link>
+          <Link className="py-2" to={`/attire${query}`} onClick={() => setOpen(false)}>Attire Guide</Link>
+          <Link className="py-2" to={`/entourage${query}`} onClick={() => setOpen(false)}>Entourage</Link>
+          <Link className="py-2" to={`/faqs${query}`} onClick={() => setOpen(false)}>FAQs</Link>
+          <Link className="py-2" to={`/your-rsvp${query}`} onClick={() => setOpen(false)}>Your RSVP</Link>
         </div>
-      )}
+      </div>
     </nav>
   );
 }
@@ -165,10 +190,77 @@ function HomePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const handleRedirect = () => {
-    const qqxx1 = searchParams.get("qqxx1");
-    navigate(`/rsvp?qqxx1=${qqxx1}`);
+    const qqxx1 = searchParams.get("rsvp") || "welcomeguest";
+    navigate(`/rsvp?rsvp=${qqxx1}`);
   };
 
+  // --- Local modal state for the ATTIRE section replica (kept separate from AttirePage) ---
+  const [homeAttireModalOpen, setHomeAttireModalOpen] = useState(false);
+  const [homeAttireModalTitle, setHomeAttireModalTitle] = useState("");
+  const [homeAttireModalKey, setHomeAttireModalKey] = useState(null); // "ninangs" | "ninongs" | "guests"
+
+  const openHomeAttireModal = (key, title) => {
+    setHomeAttireModalKey(key);
+    setHomeAttireModalTitle(title);
+    setHomeAttireModalOpen(true);
+  };
+  const closeHomeAttireModal = () => setHomeAttireModalOpen(false);
+
+  const HomeAttireModalContent = () => {
+    if (homeAttireModalKey === "ninangs") {
+      return (
+        <div className="space-y-4">
+          <p className="text-sm text-gray-700">
+            Modern Filipiniana inspiration — panuelo, butterfly sleeves, soft silhouettes.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <img src="sample_ninang_1.png" alt="Ninang Look 1" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninang_2.jpg" alt="Ninang Look 2" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninang_3.png" alt="Ninang Look 3" className="w-full h-40 object-cover rounded-lg border" />
+          </div>
+        </div>
+      );
+    }
+    if (homeAttireModalKey === "ninongs") {
+      return (
+        <div className="space-y-4">
+          <p className="text-sm text-gray-700">
+            Beige/cream barong, classic black trousers, dress shoes (no sneakers).
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <img src="sample_ninong_1.jpeg" alt="Ninong Look 1" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninong_1.webp" alt="Ninong Look 2" className="w-full h-40 object-cover rounded-lg border" />
+            <img src="sample_ninong_3.jpg" alt="Ninong Look 3" className="w-full h-40 object-cover rounded-lg border" />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-700">
+          Semi-formal in the wedding palette. Mix-and-match dresses, jumpsuits, barong/polo with slacks, and elegant footwear.
+        </p>
+        <div className="mt-4 grid grid-cols-5 gap-3">
+          <div className="h-10 rounded-xl" style={{ backgroundColor: "#6D0C2D" }}></div>
+          <div className="h-10 rounded-xl" style={{ backgroundColor: "#222222" }}></div>
+          <div className="h-10 rounded-xl" style={{ backgroundColor: "#C6A57B" }}></div>
+          <div className="h-10 rounded-xl" style={{ backgroundColor: "#CECABB" }}></div>
+          <div className="h-10 rounded-xl" style={{ backgroundColor: "#7A7A7A" }}></div>
+        </div>
+      </div>
+    );
+  };
+
+  // --- NEW: Wedding Gallery state & data (dummy images) ---
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const galleryImages = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => {
+        const n = String(i + 1).padStart(2, "0");
+        return { src: `gallery_${n}.jpg`, alt: `Wedding photo ${n}` };
+      }),
+    []
+  );
 
   return (
     <Shell
@@ -183,7 +275,7 @@ function HomePage() {
 
           {/* Mobile image */}
           <img
-            src="IMG_wedding_banner_mobile.jpg"
+            src="IMG_wedding_banner2_mobile.jpg"
             alt="Diane & Calvin Wedding Banner Mobile"
             className="block sm:hidden absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -194,9 +286,9 @@ function HomePage() {
           {/* Content */}
           <div className="relative z-10 flex items-center justify-center min-h-screen">
             <Container className="text-white text-center relative -mt-12 sm:mt-0">
-            <p className="uppercase tracking-widest text-[10px] sm:text-xs opacity-90 text-white">
-              You're Invited
-            </p> <br/>
+              <p className="uppercase tracking-widest text-[10px] sm:text-xs opacity-90 text-white">
+                You're Invited
+              </p> <br/>
               <h1 className="font-greatvibes text-4xl sm:text-5xl md:text-6xl mt-1">
                 Diane & Calvin
               </h1>
@@ -228,20 +320,301 @@ function HomePage() {
         </div>
       }
     >
-      <div className="grid md:grid-cols-2 gap-6 text-[#800020]">
+
+      {/* --- NEW: Gallery marquee CSS (scoped) --- */}
+      <style>{`
+        @keyframes gallery-marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .gallery-track {
+          width: max-content;
+          animation: gallery-marquee 35s linear infinite;
+          will-change: transform;
+        }
+        .gallery-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      {/* --- NEW: Auto-scrolling (marquee) square gallery --- */}
+      <div className="mt-8">
+        <h2 className="text-2xl text-[#800020] font-greatvibes">Wedding Gallery</h2>
+        <div className="mt-4 overflow-hidden">
+          <div className="gallery-track flex gap-4 pb-3">
+            {[...galleryImages, ...galleryImages].map((img, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setGalleryOpen(true)}
+                className="relative flex-shrink-0 w-36 h-36 sm:w-44 sm:h-44 rounded-xl overflow-hidden border border-[#800020] focus:outline-none focus:ring-2 focus:ring-[#800020]/40"
+                aria-label={`Open gallery starting from ${img.alt}`}
+              >
+                <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* NEW: Gallery Modal */}
+      {galleryOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Wedding Gallery"
+        >
+          <div className="w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 bg-[#800020] text-white">
+              <h3 className="text-lg font-semibold">Wedding Gallery</h3>
+              <button
+                type="button"
+                onClick={() => setGalleryOpen(false)}
+                className="rounded-full w-8 h-8 inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-[#800020] transition"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {galleryImages.map((img, idx) => (
+                  <div key={`modal-${idx}`} className="aspect-square rounded-xl overflow-hidden border">
+                    <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- REPLICATED CONTENT SECTIONS --- */}
+      {/* Wedding Details (replica of DetailsPage) */}
+      <div className="mt-12 border-t pt-10">
+        <h2 className="text-3xl text-[#800020] mb-6 font-greatvibes">Wedding Details</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Church Card */}
+          <Card>
+            <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+              <img
+                src="IMG_church.jpg"
+                alt="Barasoain Church"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <h2 className="text-2xl text-[#800020]">Wedding Ceremony</h2>
+            <ul className="mt-2 space-y-2 text-[#800020]">
+              <li><span className="font-medium">Date:</span> Saturday, November 22, 2025</li>
+              <li><span className="font-medium">Time:</span> 2:00 in the afternoon</li>
+              <li><span className="font-medium">Venue:</span> Barasoain Church, Malolos, Bulacan</li>
+            </ul>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href="https://waze.com/ul?ll=14.8441,120.8112"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border-2 border-[#800020] text-[#800020] px-4 py-2 font-medium hover:bg-[#800020] hover:text-white transition"
+              >
+                Open in Waze
+              </a>
+              <a
+                href="https://maps.google.com/?q=Barasoain+Church"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border-2 border-[#800020] text-[#800020] px-4 py-2 font-medium hover:bg-[#800020] hover:text-white transition"
+              >
+                Open in Google Maps
+              </a>
+            </div>
+          </Card>
+
+          {/* Reception Card */}
+          <Card>
+            <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+              <img
+                src="IMG_reception.jpg"
+                alt="Felicisima Paz Grand Pavilion & Private Resort"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <h2 className="text-2xl text-[#800020]">Wedding Reception</h2>
+            <ul className="mt-4 space-y-2 text-[#800020]">
+              <li><span className="font-medium">Venue:</span> Felicisima Paz Grand Pavilion & Private Resort</li>
+              <li><span className="font-medium">Time:</span> TBA</li>
+              <li><span className="font-medium">Location:</span> Atlag, Malolos, Bulacan</li>
+            </ul>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href="https://waze.com/ul?ll=14.8545,120.8198"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border-2 border-[#800020] text-[#800020] px-4 py-2 font-medium hover:bg-[#800020] hover:text-white transition"
+              >
+                Open in Waze
+              </a>
+              <a
+                href="https://maps.google.com/?q=Felicisima+Paz+Grand+Pavilion"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-xl border-2 border-[#800020] text-[#800020] px-4 py-2 font-medium hover:bg-[#800020] hover:text-white transition"
+              >
+                Open in Google Maps
+              </a>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Attire (replica of AttirePage with separate modal state) */}
+      <div className="mt-12 border-t pt-10">
+        <h2 className="text-3xl text-[#800020] mb-6 font-greatvibes">Attire Guide</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Ninangs */}
+          <Card>
+            <h2 className="text-2xl text-[#800020]">For Our Ninangs</h2>
+            <p className="mt-3 text-gray-700">
+              In celebration of our Filipiniana-themed wedding, we kindly request that you grace the occasion
+              in a modern filipiniana dress. Please feel free to choose any color that best expresses your personal style.
+            </p>
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={() => openHomeAttireModal("ninangs", "Sample Outfits — Ninangs")}
+                className="text-sm underline underline-offset-4 hover:opacity-80"
+                style={{ color: "#800020" }}
+              >
+                See sample outfits
+              </button>
+            </div>
+          </Card>
+
+          {/* Ninongs */}
+          <Card>
+            <h2 className="text-2xl text-[#800020]">For Our Ninongs</h2>
+            <p className="mt-3 text-gray-700">
+              We invite you to wear a beige or cream barong, paired with classic black trousers and dress shoes
+              <span className="italic"> (kindly refrain from wearing sneakers)</span>.
+            </p>
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={() => openHomeAttireModal("ninongs", "Sample Outfits — Ninongs")}
+                className="text-sm underline underline-offset-4 hover:opacity-80"
+                style={{ color: "#800020" }}
+              >
+                See sample outfits
+              </button>
+            </div>
+          </Card>
+
+          {/* Guests */}
+          <Card>
+            <h2 className="text-2xl text-[#800020]">For Our Guests</h2>
+            <p className="mt-3 text-gray-700">
+              We would love to see you in semi-formal attire that compliments our wedding color motif.
+              Please see below palette for inspiration.
+            </p>
+
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => openHomeAttireModal("guests", "Sample Outfits — Guests")}
+                className="text-sm underline underline-offset-4 hover:opacity-80"
+                style={{ color: "#800020" }}
+              >
+                See sample outfits
+              </button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Modal (burgundy + white theme) */}
+        {homeAttireModalOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label={homeAttireModalTitle}
+          >
+            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 bg-[#800020] text-white">
+                <h3 className="text-lg font-semibold">{homeAttireModalTitle}</h3>
+                <button
+                  type="button"
+                  onClick={closeHomeAttireModal}
+                  className="rounded-full w-8 h-8 inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-[#800020] transition"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 bg-white">
+                <HomeAttireModalContent />
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4 bg-gray-50 flex justify-end">
+                <button
+                  type="button"
+                  onClick={closeHomeAttireModal}
+                  className="inline-flex items-center justify-center rounded-2xl border-2 border-[#800020] text-[#800020] px-4 py-2 text-sm font-medium hover:bg-[#800020] hover:text-white transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+  
+
+      {/* FAQs (replica of FaqsPage) */}
+      <div className="mt-12 border-t pt-10">
+        <h2 className="text-3xl text-[#800020] mb-6 font-greatvibes">FAQs</h2>
         <Card>
-          <h2 className="text-xl">Wedding Details</h2>
-          <p className="mt-2">
-            Ceremony at Barasoain Church, reception at Felicisima Paz Grand Pavilion & Private Resort.
-          </p>
-          <Link to="/details" className="inline-block mt-4 text-sm font-medium underline">View Details</Link>
-        </Card>
-        <Card>
-          <h2 className="text-xl">Attire</h2>
-          <p className="mt-2">Semi-formal in our wedding palette. See inspiration looks for guests.</p>
-          <Link to="/attire" className="inline-block mt-4 text-sm font-medium underline">See Attire Guide</Link>
+          <div className="mt-4 space-y-4 text-gray-700">
+            <div>
+              <p className="font-medium">Q: Can I bring a plus one?</p>
+              <p>A: Your RSVP link will show if you have a plus one included. If not, we kindly ask for your understanding as we have very limited seating. Please refrain from bringing an additional guest unless you have confirmed with us beforehand. Our wedding coordinators will be following our guest list strictly to avoid any confusion during the event. If you’d like to request an additional guest, please message us directly — we’ll do our best to accommodate. 💛</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: Is there parking?</p>
+              <p>A: Yes. Please indicate in your RSVP if you’ll be bringing a car so we can prepare parking.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: What time should I arrive?</p>
+              <p>A: Please plan to arrive and be seated at least 15–30 minutes before the ceremony begins at 2:00 PM. This helps us start on time and keeps everything running smoothly.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: Are kids allowed?</p>
+              <p>A: We love children, but due to limited space and to ensure a peaceful ceremony, we kindly request that this be an adults-only celebration unless otherwise indicated on your invitation.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: What happens if I can’t attend after RSVPing ‘Yes’?</p>
+              <p>A: We understand plans can change. If something comes up, please let us know as soon as possible so we can offer your seat to someone else. Your presence truly means the world to us.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: What kind of gift can we give?</p>
+              <p>A: Your presence at our wedding is the most meaningful gift we could ever ask for. 💛
+If you would like to bless us with a gift, we would deeply appreciate a monetary contribution to help us start our new life together. We will have a wishing well and QR codes available at the reception for your convenience.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: Should I eat before the wedding?</p>
+              <p>A: Yes, please! Since our wedding ceremony is in the afternoon and our reception will be held at dinner time, we recommend having a light lunch or snack beforehand so you can enjoy the day comfortably. 🍽️</p>
+            </div>
+          </div>
         </Card>
       </div>
+      {/* --- END REPLICATED CONTENT SECTIONS --- */}
     </Shell>
   );
 }
@@ -332,30 +705,30 @@ function DetailsPage() {
   );
 }
 
-function VenuePage() {
-  return (
-    <Shell hero={null}>
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <h3 className="text-xl">Church</h3>
-          <p className="mt-2 text-gray-700">Barasoain Church, Malolos, Bulacan</p>
-          <div className="mt-4 flex gap-3 text-sm">
-            <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Waze</a>
-            <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Google Maps</a>
-          </div>
-        </Card>
-        <Card>
-          <h3 className="text-xl">Reception</h3>
-          <p className="mt-2 text-gray-700">Felicisima Paz Grand Pavilion & Private Resort, Atlag, Malolos, Bulacan</p>
-          <div className="mt-4 flex gap-3 text-sm">
-            <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Waze</a>
-            <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Google Maps</a>
-          </div>
-        </Card>
-      </div>
-    </Shell>
-  );
-}
+// function VenuePage() {
+//   return (
+//     <Shell hero={null}>
+//       <div className="grid md:grid-cols-2 gap-6">
+//         <Card>
+//           <h3 className="text-xl">Church</h3>
+//           <p className="mt-2 text-gray-700">Barasoain Church, Malolos, Bulacan</p>
+//           <div className="mt-4 flex gap-3 text-sm">
+//             <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Waze</a>
+//             <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Google Maps</a>
+//           </div>
+//         </Card>
+//         <Card>
+//           <h3 className="text-xl">Reception</h3>
+//           <p className="mt-2 text-gray-700">Felicisima Paz Grand Pavilion & Private Resort, Atlag, Malolos, Bulacan</p>
+//           <div className="mt-4 flex gap-3 text-sm">
+//             <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Waze</a>
+//             <a className="underline" href="#" target="_blank" rel="noreferrer">Open in Google Maps</a>
+//           </div>
+//         </Card>
+//       </div>
+//     </Shell>
+//   );
+// }
 
 function AttirePage() {
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -508,7 +881,7 @@ function AttirePage() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="inline-flex items-center justify-center rounded-xl border-2 border-[#800020] text-[#800020] px-4 py-2 text-sm font-medium hover:bg-[#800020] hover:text-white transition"
+                className="inline-flex items-center justify-center rounded-2xl border-2 border-[#800020] text-[#800020] px-4 py-2 text-sm font-medium hover:bg-[#800020] hover:text-white transition"
               >
                 Close
               </button>
@@ -531,13 +904,30 @@ function FaqsPage() {
             <p>A: Your invite link will indicate if a plus one is included. If not, we kindly ask for understanding due to limited seating.</p>
           </div>
           <div>
-            <p className="font-medium">Q: Is there parking?</p>
-            <p>A: Yes. Please indicate in your RSVP if you’ll be bringing a car so we can prepare parking.</p>
-          </div>
-          <div>
-            <p className="font-medium">Q: What time should I arrive?</p>
-            <p>A: Please plan to be seated 15–20 minutes before the ceremony begins at 2:00 PM.</p>
-          </div>
+              <p className="font-medium">Q: Is there parking?</p>
+              <p>A: Yes. Please indicate in your RSVP if you’ll be bringing a car so we can prepare parking.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: What time should I arrive?</p>
+              <p>A: Please plan to arrive and be seated at least 15–30 minutes before the ceremony begins at 2:00 PM. This helps us start on time and keeps everything running smoothly.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: Are kids allowed?</p>
+              <p>A: We love children, but due to limited space and to ensure a peaceful ceremony, we kindly request that this be an adults-only celebration unless otherwise indicated on your invitation.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: What happens if I can’t attend after RSVPing ‘Yes’?</p>
+              <p>A: We understand plans can change. If something comes up, please let us know as soon as possible so we can offer your seat to someone else. Your presence truly means the world to us.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: What kind of gift can we give?</p>
+              <p>A: Your presence at our wedding is the most meaningful gift we could ever ask for. 💛
+If you would like to bless us with a gift, we would deeply appreciate a monetary contribution to help us start our new life together. We will have a wishing well and QR codes available at the reception for your convenience.</p>
+            </div>
+            <div>
+              <p className="font-medium">Q: Should I eat before the wedding?</p>
+              <p>A: Yes, please! Since our wedding ceremony is in the afternoon and our reception will be held at dinner time, we recommend having a light lunch or snack beforehand so you can enjoy the day comfortably. 🍽️</p>
+            </div>
         </div>
       </Card>
     </Shell>
@@ -562,10 +952,121 @@ function YourRSVPPage() {
               <p><span className="font-medium">Plus One:</span> {rsvp.plusName ? rsvp.plusName : "(None added)"}</p>
             )}
             <p><span className="font-medium">Bringing Car:</span> {rsvp.bringingCar}</p>
-            <p className="mt-2 text-xs text-gray-500">Saved locally for demo. Replace with your API for production.</p>
+            {/* <p className="mt-2 text-xs text-gray-500">Saved locally for demo. Replace with your API for production.</p> */}
           </div>
         )}
       </Card>
+    </Shell>
+  );
+}
+
+/* -----------------------------
+   NEW: Entourage Page
+------------------------------*/
+function EntouragePage() {
+  const location = useLocation();
+  const query = location.search;
+
+  // Small pill sub-nav to scroll to sections
+  const items = [
+    { id: "maids", label: "Maid(s) of Honor" },
+    { id: "bestmen", label: "Best Men" },
+    { id: "partners", label: "Entourage (Partners)" },
+    { id: "candles", label: "Candles" },
+    { id: "veil", label: "Veil" },
+    { id: "cords", label: "Cords" },
+  ];
+
+  return (
+    <Shell hero={null}>
+      <div className="mb-6 flex flex-wrap gap-2">
+        {items.map((it) => (
+          <a
+            key={it.id}
+            href={`#${it.id}`}
+            className="px-3 py-1.5 rounded-full border border-[#800020] text-[#800020] text-sm hover:bg-[#800020] hover:text-white transition"
+          >
+            {it.label}
+          </a>
+        ))}
+      </div>
+
+      <div className="space-y-8">
+        <section id="maids" className="scroll-mt-24">
+          <Card>
+            <h2 className="text-3xl text-[#800020]">Maid(s) of Honor</h2>
+            <ul className="mt-3 list-disc list-inside text-gray-700">
+              <li>Ms. Eula Mae C. Ignacio</li>
+              <li>Ms. Trixie D. Hernandez</li>
+            </ul>
+          </Card>
+        </section>
+
+        <section id="bestmen" className="scroll-mt-24">
+          <Card>
+            <h2 className="text-3xl text-[#800020]">Best Men</h2>
+            <ul className="mt-3 list-disc list-inside text-gray-700">
+              <li>Mr. Carl Oliver S. Crisostomo</li>
+              <li>Mr. Ray-Ville S. Reyes</li>
+            </ul>
+          </Card>
+        </section>
+
+        <section id="partners" className="scroll-mt-24">
+          <Card>
+            <h2 className="text-3xl text-[#800020]">Entourage</h2>
+            <ul className="mt-3 list-disc list-inside text-gray-700">
+              <li>Mrs. Ashley Venice Manuel-Hum & Mr. Clarence Hum</li>
+              <li>Ms. Angelica Crisostomo & Mr. CJ Crisostomo</li>
+              <li>Ms. Kim Brescia Lhyn Clemente & Mr. Jonas James Dasmarinas</li>
+              <li>Ms. Kate Jutilo & Mr. John Eizel Padilla</li>
+              <li>Ms. Jenieca Santos & Mr. Johann Benedict Orito</li>
+              <li>Mrs. Roselyn Magdaraog & Mr. Kelvin Bumagat</li>
+              <li>Ms. Camille Loren Laya & Mr. Ray Jemmo Pagtalunan</li>
+              <li>Ms. Adeza C. Padilla</li>
+            </ul>
+          </Card>
+        </section>
+
+        <section id="candles" className="scroll-mt-24">
+          <Card>
+            <h2 className="text-3xl text-[#800020]">Candles</h2>
+            <ul className="mt-3 list-disc list-inside text-gray-700">
+              <li>Ms. Regine C. Biana & Mr. Julio Efrax Ando</li>
+              <li>Mrs. Melanie Crisostomo & Mr. Eric Santos</li>
+            </ul>
+          </Card>
+        </section>
+
+        <section id="veil" className="scroll-mt-24">
+          <Card>
+            <h2 className="text-3xl text-[#800020]">Veil</h2>
+            <ul className="mt-3 list-disc list-inside text-gray-700">
+              <li>Ms. Alma Lopez & Mr. Michael Brian Bernardo</li>
+              <li>Ms. Czarina S. Crisostomo & Mr. Jim Wel Campillo</li>
+            </ul>
+          </Card>
+        </section>
+
+        <section id="cords" className="scroll-mt-24">
+          <Card>
+            <h2 className="text-3xl text-[#800020]">Cords</h2>
+            <ul className="mt-3 list-disc list-inside text-gray-700">
+              <li>Mrs. Krischelle Velasquez-Sanchez & Mr. Joshua Sanchez</li>
+              <li>Mrs. Richel Ann Florentino & Mr. Francis Erizz Florentino</li>
+            </ul>
+          </Card>
+        </section>
+      </div>
+
+      <div className="mt-10 text-center">
+        <Link
+          to={`/${query}`}
+          className="inline-flex items-center justify-center rounded-2xl border-2 border-[#800020] text-[#800020] px-5 py-2 font-medium hover:bg-[#800020] hover:text-white transition"
+        >
+          Back to Home
+        </Link>
+      </div>
     </Shell>
   );
 }
@@ -578,7 +1079,7 @@ function RsvpPage() {
   const { setRsvp } = useRSVP();
 
   const [searchParams] = useSearchParams();
-  const plusOneParam = searchParams.get("qqxx1");
+  const plusOneParam = searchParams.get("rsvp");
 
   const [submitted, setSubmitted] = useState(false);
   const [attendance, setAttendance] = useState(""); // Yes | No | Maybe
@@ -586,12 +1087,13 @@ function RsvpPage() {
   const [contact, setContact] = useState("");
   const [side, setSide] = useState("Bride");
   // const [plusAllowance, setPlusAllowance] = useState("Not Allowed"); // Allowed | Not Allowed
-  const [plusAllowance, setPlusAllowance] = useState(plusOneParam === "qqwwwq23221124asdfaeflkj1ohui12uih3hui12huiadjknadnjkcqnjkciough12uihg3123f2qq" ? "Allowed" : "Not Allowed");
+  const [plusAllowance, setPlusAllowance] = useState(plusOneParam === "welcome" ? "Allowed" : "Not Allowed");
   const [plusName, setPlusName] = useState("");
   const [bringingCar, setBringingCar] = useState("No");
   const [errors, setErrors] = useState([]);
 
-
+  const location = useLocation();
+  const query = location.search; // e.g. "?qqxx=abc123" 
 
   const validate = () => {
     const errs = [];
@@ -615,50 +1117,50 @@ function RsvpPage() {
   // };
 
   const onSubmit = async (e) => {
-  e.preventDefault();
-  const v = validate();
-  setErrors(v);
-  if (v.length === 0) {
-    const formData = new URLSearchParams();
-    formData.append("name", name);
-    formData.append("phone", contact);
-    formData.append("contact_name", side); // Assuming 'side' maps to contact_name
-    formData.append("q1", attendance);
-    formData.append("q2", bringingCar);
+    e.preventDefault();
+    const v = validate();
+    setErrors(v);
+    if (v.length === 0) {
+      const formData = new URLSearchParams();
+      formData.append("name", name);
+      formData.append("phone", contact);
+      formData.append("contact_name", side); // Assuming 'side' maps to contact_name
+      formData.append("q1", attendance);
+      formData.append("q2", bringingCar);
 
-    try {
-      const response = await fetch("http://3.27.41.186/submit_form", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: formData
-      });
+      try {
+        const response = await fetch("http://3.27.41.186/submit_form", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: formData
+        });
 
-      const result = await response.json();
-      console.log("Submitted:", result);
-      setRsvp({ name, contact, side, attendance, plusAllowance, plusName, bringingCar });
-      setSubmitted(true);
-    } catch (error) {
-      console.error("Submission failed:", error);
-      setErrors(["Failed to submit RSVP. Please try again later."]);
+        const result = await response.json();
+        console.log("Submitted:", result);
+        setRsvp({ name, contact, side, attendance, plusAllowance, plusName, bringingCar });
+        setSubmitted(true);
+      } catch (error) {
+        console.error("Submission failed:", error);
+        setErrors(["Failed to submit RSVP. Please try again later."]);
+      }
     }
-  }
-};
+  };
 
   const Result = () => {
     const commonBtn = (
       <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
         {(attendance === "Yes" || attendance === "Maybe") && (
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/" + query)}
             className="inline-flex items-center justify-center rounded-2xl bg-gray-900 text-white px-5 py-3 font-medium shadow hover:bg-gray-800"
           >
             Go to Wedding Website
           </button>
         )}
         <button
-          onClick={() => navigate("/your-rsvp")}
+          onClick={() => navigate("/your-rsvp" + query)}
           className="inline-flex items-center justify-center rounded-2xl border border-gray-300 px-5 py-3 font-medium hover:bg-gray-50"
         >
           View Your RSVP
@@ -833,8 +1335,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/details" element={<DetailsPage />} />
-          <Route path="/venue" element={<VenuePage />} />
+          {/* <Route path="/venue" element={<VenuePage />} /> */}
           <Route path="/attire" element={<AttirePage />} />
+          <Route path="/entourage" element={<EntouragePage />} />
           <Route path="/faqs" element={<FaqsPage />} />
           <Route path="/your-rsvp" element={<YourRSVPPage />} />
           <Route path="/rsvp" element={<RsvpPage />} />
