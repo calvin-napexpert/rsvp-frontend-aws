@@ -1124,7 +1124,7 @@ function RsvpPage() {
       const formData = new URLSearchParams();
       formData.append("name", name);
       formData.append("phone", contact);
-      formData.append("contact_name", side); // Assuming 'side' maps to contact_name
+      formData.append("contact_name", plusName);
       formData.append("q1", attendance);
       formData.append("q2", bringingCar);
 
@@ -1147,6 +1147,7 @@ function RsvpPage() {
       }
     }
   };
+
 
   const Result = () => {
     const commonBtn = (
