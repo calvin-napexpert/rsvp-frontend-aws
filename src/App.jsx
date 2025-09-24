@@ -616,16 +616,16 @@ function RsvpPage() {
   // };
 
   const onSubmit = async (e) => {
-  e.preventDefault();
-  const v = validate();
-  setErrors(v);
-  if (v.length === 0) {
-    const formData = new URLSearchParams();
-    formData.append("name", name);
-    formData.append("phone", contact);
-    formData.append("contact_name", plusName); // Assuming 'side' maps to contact_name
-    formData.append("q1", attendance);
-    formData.append("q2", bringingCar);
+    e.preventDefault();
+    const v = validate();
+    setErrors(v);
+    if (v.length === 0) {
+      const formData = new URLSearchParams();
+      formData.append("name", name);
+      formData.append("phone", contact);
+      formData.append("contact_name", side); // Assuming 'side' maps to contact_name
+      formData.append("q1", attendance);
+      formData.append("q2", bringingCar);
 
     try {
       const response = await fetch("https://api.dcinnovare.com/submit_form", {
