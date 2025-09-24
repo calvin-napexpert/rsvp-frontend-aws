@@ -1129,7 +1129,7 @@ function RsvpPage() {
       formData.append("q2", bringingCar);
 
       try {
-        const response = await fetch("http://3.27.41.186/submit_form", {
+        const response = await fetch("https://api.dcinnovare.com/submit_form", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
